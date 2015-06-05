@@ -1,9 +1,10 @@
 package tipo;
 
 public class FuncoesCalculadora {
+	private final String operadores = "+\\-*/";
 	private String expressao = "";
 	private String operador = "";
-	private String valor1 = "";
+	private String valor1 = "0";
 	private String valor2 = "";
 	private String resultado = "";
 	private String menClear;
@@ -51,7 +52,7 @@ public class FuncoesCalculadora {
 	
 	public String recebeNumero(String valor){
 		verificaValor(valor);
-		arredondaZero(resultado);
+		editaExpressao();
 		
 		return expressao;
 	}
@@ -59,40 +60,51 @@ public class FuncoesCalculadora {
 	private void verificaValor(String valor){
 		if(valor.matches("[0-9]")){
 			if(operador.equals("")){
+				if(valor1.equals("0")){
+					valor1 = "";
+				}
 				valor1 += valor;
-				expressao += valor;
 			}
 			else{
 				valor2 += valor;
-				expressao += " " + valor;
 			}
 		}
-		
-		else if(!valor1.equals("")){
-			if(valor.equals("+")){
+		else if(valor.matches("(["+operadores+"]{1})")){
+			if(valor2.equals("")){
 				operador = valor;
-				expressao += " " + valor;
 			}
-			if(valor.equals("-")){
-				operador = valor;
-				expressao += " " + valor;
-			}
-			if(valor.equals("*")){
-				operador = valor;
-				expressao += " " + valor;
-			}
-			else if(valor.equals("/")){
-				operador = valor;
-				expressao += " " + valor;
-			}
-			else if(valor.equals("=")){
+			else{
 				verificaOperador();
+				operador = valor;
+				valor1 = resultado;
+				valor2 = "";
+				resultado = "";
+			}
+		}
+		else if(valor.equals("=")){
+			if(!resultado.equals("")){
+				verificaOperador();
+			}
+			else if(!valor2.equals("")){
+				verificaOperador();
+				valor1 = resultado;
+				valor2 = "";
+				resultado = "";
+				operador = "";
+			}
+			else if(!operador.equals("") && valor2.equals("")){
+				valor2 = valor1;
+				verificaOperador();
+				valor1 = resultado;
+				valor2 = "";
+				resultado = "";
+				operador = "";
 			}
 		}
 	}
 	
 	private void verificaOperador(){
-		if(valor2.equals("")) return;
+		//if(valor2.equals("")) return;
 		
 		switch(operador){
 		case "+":
@@ -113,24 +125,28 @@ public class FuncoesCalculadora {
 	private void soma(){
 		double result = Double.parseDouble(valor1) + Double.parseDouble(valor2);
 		this.resultado =  String.valueOf(result);
+		arredondaZero(resultado);
 		expressao = resultado;
 	}
 	
 	private void subtracao(){
 		double result = Double.parseDouble(valor1) - Double.parseDouble(valor2);
 		this.resultado =  String.valueOf(result);
+		arredondaZero(resultado);
 		expressao = resultado;
 	}
 	
 	private void multiplicacao(){
 		double result = Double.parseDouble(valor1) * Double.parseDouble(valor2);
 		this.resultado =  String.valueOf(result);
+		arredondaZero(resultado);
 		expressao = resultado;
 	}
 	
 	private void divisao(){
 		double result = Double.parseDouble(valor1) / Double.parseDouble(valor2);
 		this.resultado =  String.valueOf(result);
+		arredondaZero(resultado);
 		expressao = resultado;
 	}
 	
@@ -139,6 +155,11 @@ public class FuncoesCalculadora {
 			resultado = resultado.substring(0, resultado.lastIndexOf("."));
 			expressao = resultado;
 		}
+	}
+	
+	
+	private void editaExpressao(){
+		expressao = String.format("%s%s%s%s", valor1, operador, valor2, resultado);
 	}
 	
 }
